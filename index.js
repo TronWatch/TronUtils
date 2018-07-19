@@ -16,17 +16,14 @@ module.exports = {
     rpc
 };
 
-const {pubToHex} = require("./utils/crypto");
+async function test(){
+  let rpc = new module.exports.rpc();
 
-function test(){
-    let test = pubToHex("TSnjgPDQfuxx72iaPy82v3T8HrsN4GVJzW");
-    console.log(test);
+  let priv = "d5f10a95bc9205062724f8487c2857c509ac6de6ac45c86c4716d12dff1cdb5987f373741328230dcebff59199db90d633d58930832bcfe5409cac0535297dca";
+  let recipient = "TFoQGhmSQzLgnZjLYGAgGkAH8GUoe8J4Qb";
 
-
-    let priv = "";
-    let recipient = "TFoQGhmSQzLgnZjLYGAgGkAH8GUoe8J4Qb";
-
-    module.exports.rpc.sendTrx(priv, recipient, 5000);
+  let response = await rpc.sendTrx(priv, recipient, 5000);
+  console.log(response);
 }
 
 test();
