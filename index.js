@@ -16,8 +16,17 @@ module.exports = {
     rpc
 };
 
+const {pubToHex} = require("./utils/crypto");
+
 function test(){
-    module.exports.rpc.sendTrx("123", "TVMP5r12ymtNerq5KB4E8zAgLDmg2FqsEG", 5000);
+
+
+    let test = pubToHex("TSnjgPDQfuxx72iaPy82v3T8HrsN4GVJzW");
+    console.log(test);
+
+
+  //module.exports.rpc.sendTrx("123", "TVMP5r12ymtNerq5KB4E8zAgLDmg2FqsEG", 5000);
+
 }
 
 test();

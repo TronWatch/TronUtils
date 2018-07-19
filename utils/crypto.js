@@ -95,7 +95,6 @@ function getBase58CheckAddress(addressBytes) {
 }
 
 function decode58Check(addressStr) {
-
   let decodeCheck = decode58(addressStr);
   if (decodeCheck.length <= 4) {
     console.error("ERROR CHECK");
@@ -114,6 +113,23 @@ function decode58Check(addressStr) {
   }
 
   return null;
+}
+
+function toHexString(byteArray) {
+  return Array.from(byteArray, function(byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('')
+}
+
+function pubToHex(pub){
+  let decodeCheck = decode58(pub);
+  if (decodeCheck.length <= 4) {
+    console.error("ERROR CHECK");
+    return null;
+  }
+
+  let decodeData = decodeCheck.slice(0, decodeCheck.length - 4);
+  return toHexString(decodeData);
 }
 
 function isAddressValid(base58Str) {
@@ -245,5 +261,6 @@ module.exports = {
   pkToAddress,
   decode58Check,
   signBytes,
-  SHA256
+  SHA256,
+  pubToHex
 };

@@ -9,6 +9,8 @@ const axios = require("axios");
 
 
 const url = "https://api.tron.watch";
+const url_full = "http://rpc.tron.watch:8090";
+const url_solidity = "http://rpc.tron.watch:8091";
 
 module.exports = {
 
@@ -16,8 +18,14 @@ module.exports = {
     return await axios.get(url + "/grpc/getLastBlock").then(r => blocks.blockFromBase64(r.data));
   },
 
-  async sendTrx(privateKey, recipient, amount){
+  async getNowBlock(){
 
+  },
+
+  async sendTrx(privateKey, recipient, amount){
+    //let unsigned =
+
+    /*
     let nowBlock = await this.getLastBlock();
     let myAddress = accounts.privateKeyToAddress(privateKey);
     let props = {
@@ -30,6 +38,7 @@ module.exports = {
     let unsigned = await transactions.createUnsignedTransferTransaction(props, nowBlock);
     console.log(unsigned.toObject());
     console.log(unsigned.getRawData().getContractList()[0].toObject());
+    */
 
 
   }
