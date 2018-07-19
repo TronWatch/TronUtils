@@ -19,14 +19,14 @@ module.exports = {
 const {pubToHex} = require("./utils/crypto");
 
 function test(){
-
-
     let test = pubToHex("TSnjgPDQfuxx72iaPy82v3T8HrsN4GVJzW");
     console.log(test);
 
 
-  //module.exports.rpc.sendTrx("123", "TVMP5r12ymtNerq5KB4E8zAgLDmg2FqsEG", 5000);
+    let priv = "";
+    let recipient = "TFoQGhmSQzLgnZjLYGAgGkAH8GUoe8J4Qb";
 
+    module.exports.rpc.sendTrx(priv, recipient, 5000);
 }
 
 test();

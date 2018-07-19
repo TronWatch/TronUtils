@@ -32,6 +32,18 @@ function signTransaction(priKeyBytes, transaction) {
   return transaction;
 }
 
+function getSignature(priKeyBytes, txID){
+  if (typeof priKeyBytes === 'string') {
+    priKeyBytes = hexStr2byteArray(priKeyBytes);
+  }
+
+  console.log("TXID: " + txID);
+  let hashBytes = hexStr2byteArray(txID);
+  let signBytes = ECKeySign(hashBytes, priKeyBytes);
+  let uint8Array = new Uint8Array(signBytes);
+  return byteArray2hexStr(uint8Array);
+}
+
 function arrayToBase64String(a) {
   return btoa(String.fromCharCode(...a));
 }
@@ -73,8 +85,8 @@ function computeAddress(pubBytes) {
     pubBytes = pubBytes.slice(1);
   }
 
-  var hash = keccak256(pubBytes).toString();
-  var addressHex = hash.substring(24);
+  let hash = keccak256(pubBytes).toString();
+  let addressHex = hash.substring(24);
   addressHex = ADDRESS_PREFIX + addressHex;
   return hexStr2byteArray(addressHex);
 }
@@ -87,9 +99,9 @@ function getAddressFromPriKey(priKeyBytes) {
 
 //return address by Base58Check String,
 function getBase58CheckAddress(addressBytes) {
-  var hash0 = SHA256(addressBytes);
-  var hash1 = SHA256(hash0);
-  var checkSum = hash1.slice(0, 4);
+  let hash0 = SHA256(addressBytes);
+  let hash1 = SHA256(hash0);
+  let checkSum = hash1.slice(0, 4);
   checkSum = addressBytes.concat(checkSum);
   return encode58(checkSum);
 }
@@ -101,9 +113,9 @@ function decode58Check(addressStr) {
     return null;
   }
 
-  var decodeData = decodeCheck.slice(0, decodeCheck.length - 4);
-  var hash0 = SHA256(decodeData);
-  var hash1 = SHA256(hash0);
+  let decodeData = decodeCheck.slice(0, decodeCheck.length - 4);
+  let hash0 = SHA256(decodeData);
+  let hash1 = SHA256(hash0);
 
   if (hash1[0] === decodeCheck[decodeData.length] &&
     hash1[1] === decodeCheck[decodeData.length + 1] &&
@@ -139,7 +151,7 @@ function isAddressValid(base58Str) {
   if (base58Str.length !== ADDRESS_SIZE) {
     return false;
   }
-  var address = decode58(base58Str);
+  let address = decode58(base58Str);
 
   if (address.length !== 25) {
     return false;
@@ -147,13 +159,15 @@ function isAddressValid(base58Str) {
   if (address[0] !== ADDRESS_PREFIX_BYTE) {
     return false;
   }
-  var checkSum = address.slice(21);
+  let checkSum = address.slice(21);
   address = address.slice(0, 21);
-  var hash0 = SHA256(address);
-  var hash1 = SHA256(hash0);
-  var checkSum1 = hash1.slice(0, 4);
-  if (checkSum[0] == checkSum1[0] && checkSum[1] == checkSum1[1] && checkSum[2]
-      == checkSum1[2] && checkSum[3] == checkSum1[3]
+  let hash0 = SHA256(address);
+  let hash1 = SHA256(hash0);
+  let checkSum1 = hash1.slice(0, 4);
+  if (checkSum[0] === checkSum1[0] &&
+    checkSum[1] === checkSum1[1] &&
+    checkSum[2] === checkSum1[2] &&
+    checkSum[3] === checkSum1[3]
   ) {
     return true
   }
@@ -162,9 +176,9 @@ function isAddressValid(base58Str) {
 
 //return address by Base58Check String, priKeyBytes is base64String
 function getBase58CheckAddressFromPriKeyBase64String(priKeyBase64String) {
-  var priKeyBytes = base64DecodeFromString(priKeyBase64String);
-  var pubBytes = getPubKeyFromPriKey(priKeyBytes);
-  var addressBytes = computeAddress(pubBytes);
+  let priKeyBytes = base64DecodeFromString(priKeyBase64String);
+  let pubBytes = getPubKeyFromPriKey(priKeyBytes);
+  let addressBytes = computeAddress(pubBytes);
   return getBase58CheckAddress(addressBytes);
 }
 
@@ -173,36 +187,33 @@ function getHexStrAddressFromPriKeyBase64String(priKeyBase64String) {
   let priKeyBytes = base64DecodeFromString(priKeyBase64String);
   let pubBytes = getPubKeyFromPriKey(priKeyBytes);
   let addressBytes = computeAddress(pubBytes);
-  let addressHex = byteArray2hexStr(addressBytes);
-  return addressHex;
+  return byteArray2hexStr(addressBytes);
 }
 //return address by String, priKeyBytes is base64String
 function getAddressFromPriKeyBase64String(priKeyBase64String) {
   let priKeyBytes = base64DecodeFromString(priKeyBase64String);
   let pubBytes = getPubKeyFromPriKey(priKeyBytes);
   let addressBytes = computeAddress(pubBytes);
-  let addressBase64 = base64EncodeToString(addressBytes);
-  return addressBase64;
+  return base64EncodeToString(addressBytes);
 }
 
 //return pubkey by 65 bytes, priKeyBytes is byte[]
 function getPubKeyFromPriKey(priKeyBytes) {
-  var ec = new EC('secp256k1');
-  var key = ec.keyFromPrivate(priKeyBytes, 'bytes');
-  var pubkey = key.getPublic();
-  var x = pubkey.x;
-  var y = pubkey.y;
-  var xHex = x.toString('hex');
+  let ec = new EC('secp256k1');
+  let key = ec.keyFromPrivate(priKeyBytes, 'bytes');
+  let pubkey = key.getPublic();
+  let x = pubkey.x;
+  let y = pubkey.y;
+  let xHex = x.toString('hex');
   while (xHex.length < 64) {
     xHex = "0" + xHex;
   }
-  var yHex = y.toString('hex');
+  let yHex = y.toString('hex');
   while (yHex.length < 64) {
     yHex = "0" + yHex;
   }
-  var pubkeyHex = "04" + xHex + yHex;
-  var pubkeyBytes = hexStr2byteArray(pubkeyHex);
-  return pubkeyBytes;
+  let pubkeyHex = "04" + xHex + yHex;
+  return hexStr2byteArray(pubkeyHex);
 }
 
 //return sign by 65 bytes r s id. id < 27
@@ -262,5 +273,6 @@ module.exports = {
   decode58Check,
   signBytes,
   SHA256,
-  pubToHex
+  pubToHex,
+  getSignature
 };
