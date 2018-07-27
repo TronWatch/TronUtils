@@ -60,11 +60,10 @@ class Rpc {
     getContracts(transaction){
         let out = [];
         for(let c in transaction.raw_data.contract){
-            out.push({
-                ...transaction.raw_data.contract[c],
-                timestamp : transaction.raw_data.timestamp,
-                txID : transaction.txID
-            });
+            let contract = transaction.raw_data.contract[c];
+            contract.timestamp = transaction.raw_data.timestamp;
+            contract.txID = transaction.txID;
+            out.push(contract);
         }
         return out;
     }
