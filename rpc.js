@@ -35,6 +35,58 @@ class Rpc {
         return (await this.fullReq("/wallet/broadcasttransaction", transaction)).data;
     }
 
+    async getTransactionsFromThis(address){
+        let hex = pubToHex(address);
+        return await this.solidityReq('/walletextension/gettransactionsfromthis', {
+            account : {
+                address : hex
+            },
+            offset : 0,
+            limit : 50
+        });
+    }
+
+    async getTransactionsToThis(address){
+        let hex = pubToHex(address);
+        return await this.solidityReq('/walletextension/gettransactionstothis', {
+            account : {
+                address : hex
+            },
+            offset : 0,
+            limit : 50
+        });
+    }
+
+    getContracts(transaction){
+        let out = [];
+        for(let c in transaction.raw_data.contract){
+            out.push({
+                ...transaction.raw_data.contract[c],
+                timestamp : transaction.raw_data.timestamp,
+                txID : transaction.txID
+            });
+        }
+        return out;
+    }
+
+    async getTransactions(address){
+        let transactionsTo = await this.getTransactionsToThis(address);
+        let transactionsFrom = await this.getTransactionsFromThis(address);
+
+        let contracts = [];
+
+        while(transactionsFrom.transaction.length > 0)
+            contracts = contracts.concat(this.getContracts(transactionsFrom.transaction.pop()));
+        while(transactionsTo.length > 0)
+            contracts = contracts.concat(this.getContracts(transactionsTo.transaction.pop()));
+
+        contracts = contracts.sort((a,b)=>{
+            return a.timestamp - b.timestamp
+        });
+
+        return contracts;
+    }
+
     async sendTrx(privateKey, recipient, amount) {
         let myAddress = accounts.privateKeyToAddress(privateKey);
         let myHex = pubToHex(myAddress);

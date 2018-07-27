@@ -23,3 +23,14 @@ async function test() {
 
 test();
 */
+
+/*
+async function test(){
+    let rpc = new module.exports.rpc();
+    let transactions = await rpc.getTransactions("TTjPUZxwhDjCdnyo7qTcTW3Wm5G6stEE6g");
+    console.log((JSON.stringify(transactions[0])));
+}
+
+test();
+*/
+
