@@ -59,6 +59,7 @@ class Rpc {
 
     getContracts(transaction){
         let out = [];
+        console.log(transaction.raw_data.contract);
         for(let c in transaction.raw_data.contract){
             let contract = transaction.raw_data.contract[c];
             contract.timestamp = transaction.raw_data.timestamp;
@@ -76,7 +77,7 @@ class Rpc {
 
         while(transactionsFrom.transaction.length > 0)
             contracts = contracts.concat(this.getContracts(transactionsFrom.transaction.pop()));
-        while(transactionsTo.length > 0)
+        while(transactionsTo.transaction.length > 0)
             contracts = contracts.concat(this.getContracts(transactionsTo.transaction.pop()));
 
         contracts = contracts.sort((a,b)=>{

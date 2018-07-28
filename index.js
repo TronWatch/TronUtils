@@ -27,7 +27,7 @@ test();
 /*
 async function test(){
     let rpc = new module.exports.rpc();
-    let transactions = await rpc.getTransactions("TTjPUZxwhDjCdnyo7qTcTW3Wm5G6stEE6g");
+    let transactions = await rpc.getTransactions("TNuAr6FSrXrrU9jevJAaRsFs5Pq98nSSGA");
     console.log((JSON.stringify(transactions[0])));
 }
 
