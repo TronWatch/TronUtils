@@ -19,10 +19,11 @@ class Rpc {
     }
 
 
-    async fullReq(url, args={}){
+    async fullReq(url, args = {}) {
         return this.rpcReq(this.url_full, url, args);
     }
-    async solidityReq(url, args={}){
+
+    async solidityReq(url, args = {}) {
         return this.rpcReq(this.url_solidity, url, args);
     }
 
@@ -35,32 +36,32 @@ class Rpc {
         return (await this.fullReq("/wallet/broadcasttransaction", transaction)).data;
     }
 
-    async getTransactionsFromThis(address){
+    async getTransactionsFromThis(address) {
         let hex = pubToHex(address);
         return await this.solidityReq('/walletextension/gettransactionsfromthis', {
-            account : {
-                address : hex
+            account: {
+                address: hex
             },
-            offset : 0,
-            limit : 50
+            offset: 0,
+            limit: 50
         });
     }
 
-    async getTransactionsToThis(address){
+    async getTransactionsToThis(address) {
         let hex = pubToHex(address);
         return await this.solidityReq('/walletextension/gettransactionstothis', {
-            account : {
-                address : hex
+            account: {
+                address: hex
             },
-            offset : 0,
-            limit : 50
+            offset: 0,
+            limit: 50
         });
     }
 
-    getContracts(transaction){
+    getContracts(transaction) {
         let out = [];
         console.log(transaction.raw_data.contract);
-        for(let c in transaction.raw_data.contract){
+        for (let c in transaction.raw_data.contract) {
             let contract = transaction.raw_data.contract[c];
             contract.timestamp = transaction.raw_data.timestamp;
             contract.txID = transaction.txID;
@@ -69,18 +70,18 @@ class Rpc {
         return out;
     }
 
-    async getTransactions(address){
+    async getTransactions(address) {
         let transactionsTo = await this.getTransactionsToThis(address);
         let transactionsFrom = await this.getTransactionsFromThis(address);
 
         let contracts = [];
 
-        while(transactionsFrom.transaction.length > 0)
+        while (transactionsFrom.transaction.length > 0)
             contracts = contracts.concat(this.getContracts(transactionsFrom.transaction.pop()));
-        while(transactionsTo.transaction.length > 0)
+        while (transactionsTo.transaction.length > 0)
             contracts = contracts.concat(this.getContracts(transactionsTo.transaction.pop()));
 
-        contracts = contracts.sort((a,b)=>{
+        contracts = contracts.sort((a, b) => {
             return a.timestamp - b.timestamp
         });
 
@@ -101,6 +102,26 @@ class Rpc {
         return await this.solidityReq('/walletsolidity/getaccount', {
             address: addressHex
         });
+    }
+
+    async getTransactionById(id) {
+        return await this.solidityReq('/walletsolidity/gettransactionbyid', { value: id });
+    }
+
+    async getWitnesses() {
+        return await this.solidityReq('/walletsolidity/listwitnesses');
+    }
+
+    async getNowBlock() {
+        return await this.solidityReq('/walletsolidity/getnowblock');
+    }
+
+    async getBlock(id) {
+        return await this.solidityReq('/walletsolidity/getblockbynum', { num: id });
+    }
+
+    async getTokens() {
+        return await this.solidityReq('/walletsolidity/getassetissuelist');
     }
 
     /******************************************************
