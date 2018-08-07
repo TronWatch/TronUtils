@@ -33,7 +33,7 @@ class Rpc {
     }
 
     async broadcastTransaction(transaction) {
-        return (await this.fullReq("/wallet/broadcasttransaction", transaction)).data;
+        return (await this.fullReq("/wallet/broadcasttransaction", transaction));
     }
 
     async getTransactionsFromThis(address) {
@@ -62,7 +62,7 @@ class Rpc {
         let out = [];
         console.log(transaction.raw_data.contract);
         for (let c in transaction.raw_data.contract) {
-            let contract = transaction.raw_data.contract[c];
+            let contract = transaction.raw_data.contract[ c ];
             contract.timestamp = transaction.raw_data.timestamp;
             contract.txID = transaction.txID;
             out.push(contract);
@@ -97,9 +97,45 @@ class Rpc {
         return await this.broadcastTransaction(transaction);
     }
 
+    async freezeBalance(privateKey, amount, duration=3){
+        let myAddress = accounts.privateKeyToAddress(privateKey);
+        let myHex = pubToHex(myAddress);
+
+        let transaction = await this.getUnsignedFreezeBalance(myHex, amount, duration);
+        console.log('transaction:');
+        console.log(transaction);
+        let signed = this.signTransaction(privateKey, transaction);
+        return await this.broadcastTransaction(signed);
+    }
+
+    async deployContract(privateKey, abi, bytecode, name, callValue, bandwidthLimit, cpuLimit, dropLimit, storageLimit) {
+        let myAddress = accounts.privateKeyToAddress(privateKey);
+        let myHex = pubToHex(myAddress);
+
+        let transaction = await this.getUnsignedCreateContract(myHex, abi, bytecode, name, callValue, bandwidthLimit, cpuLimit, dropLimit, storageLimit);
+        console.log(transaction);
+        transaction = this.signTransaction(privateKey, transaction);
+        return await this.broadcastTransaction(transaction);
+    }
+
+    async triggerContract(privateKey, address, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue) {
+        let myAddress = accounts.privateKeyToAddress(privateKey);
+        let myHex = pubToHex(myAddress);
+
+        let transaction = await this.getUnsignedTriggerContract(address, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue, myHex);
+        console.log('unsigned:');
+        console.log(transaction);
+        let signed = this.signTransaction(privateKey, transaction.transaction);
+        return await this.broadcastTransaction(signed);
+    }
+
+    async getAccountByPriv(priv){
+        return this.getAccount(accounts.privateKeyToAddress(priv));
+    }
+
     async getAccount(address) {
         let addressHex = pubToHex(address);
-        return await this.solidityReq('/walletsolidity/getaccount', {
+        return await this.fullReq('/wallet/getaccount', {
             address: addressHex
         });
     }
@@ -134,6 +170,48 @@ class Rpc {
             "owner_address": from,
             "amount": amount
         });
+    }
+
+    async getUnsignedCreateContract(owner, abi, bytecode, name, callValue, bandwidthLimit, cpuLimit, dropLimit, storageLimit) {
+        let req = {
+            abi: JSON.stringify(abi),
+            bytecode: bytecode,
+            contract_name: name,
+            owner_address: owner,
+            call_value: callValue,
+            bandwidth_limit: bandwidthLimit,
+            cpu_limit: cpuLimit,
+            drop_limit: dropLimit,
+            storage_limit: storageLimit
+        };
+        console.log(JSON.stringify(req, null, 2));
+        return await this.fullReq("/wallet/deploycontract", req);
+    }
+
+    async getUnsignedTriggerContract(contract_address, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue, ownerAddress) {
+        let req = {
+            contract_address,
+            function_selector : functionselector,
+            parameter,
+            bandwidth_limit: bandwidthlimit,
+            cpu_limit : cpulimit,
+            storage_limit : storagelimit,
+            drop_limit: droplimit,
+            call_value: callvalue,
+            owner_address:owneraddress
+        };
+        console.log(JSON.stringify(req));
+        return await this.fullReq('/wallet/triggersmartcontract', req);
+    }
+
+    async getUnsignedFreezeBalance(owner_address, frozen_balance, frozen_duration){
+        let req = {
+            owner_address,
+            frozen_balance,
+            frozen_duration
+        };
+        console.log(req);
+        return await this.fullReq('/wallet/freezebalance', req);
     }
 
 }
