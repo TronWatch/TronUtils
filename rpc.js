@@ -108,7 +108,14 @@ class Rpc {
         return await this.broadcastTransaction(signed);
     }
 
-    async deployContract(privateKey, abi, bytecode, name, callValue, bandwidthLimit, cpuLimit, dropLimit, storageLimit) {
+    async deployContract(privateKey, abi, bytecode, name, callValue, options) {
+        const {
+            bandwidthLimit,
+            cpuLimit,
+            dropLimit,
+            storageLimit
+        } = options;
+
         let myAddress = accounts.privateKeyToAddress(privateKey);
         let myHex = pubToHex(myAddress);
 
@@ -118,7 +125,14 @@ class Rpc {
         return await this.broadcastTransaction(transaction);
     }
 
-    async triggerContract(privateKey, address, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue) {
+    async triggerContract(privateKey, address, functionSelector, parameter, callValue, options) {
+        const {
+            bandwidthLimit,
+            cpuLimit,
+            dropLimit,
+            storageLimit
+        } = options;
+
         let myAddress = accounts.privateKeyToAddress(privateKey);
         let myHex = pubToHex(myAddress);
 
