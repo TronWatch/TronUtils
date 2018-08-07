@@ -108,12 +108,13 @@ class Rpc {
         return await this.broadcastTransaction(signed);
     }
 
-    async deployContract(privateKey, abi, bytecode, name, callValue, options) {
+    async deployContract(privateKey, abi, bytecode, name,  options) {
         const {
             bandwidthLimit,
             cpuLimit,
             dropLimit,
-            storageLimit
+            storageLimit,
+            callValue
         } = options;
 
         let myAddress = accounts.privateKeyToAddress(privateKey);
