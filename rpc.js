@@ -126,12 +126,13 @@ class Rpc {
         return await this.broadcastTransaction(transaction);
     }
 
-    async triggerContract(privateKey, address, functionSelector, parameter, callValue, options) {
+    async triggerContract(privateKey, address, functionSelector, parameter, options) {
         const {
             bandwidthLimit,
             cpuLimit,
             dropLimit,
-            storageLimit
+            storageLimit,
+            callValue
         } = options;
 
         let myAddress = accounts.privateKeyToAddress(privateKey);
