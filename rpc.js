@@ -207,14 +207,14 @@ class Rpc {
     async getUnsignedTriggerContract(contract_address, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue, ownerAddress) {
         let req = {
             contract_address,
-            function_selector : functionselector,
+            function_selector : functionSelector,
             parameter,
-            bandwidth_limit: bandwidthlimit,
-            cpu_limit : cpulimit,
-            storage_limit : storagelimit,
-            drop_limit: droplimit,
-            call_value: callvalue,
-            owner_address:owneraddress
+            bandwidth_limit: bandwidthLimit,
+            cpu_limit : cpuLimit,
+            storage_limit : storageLimit,
+            drop_limit: dropLimit,
+            call_value: callValue,
+            owner_address:ownerAddress
         };
         console.log(JSON.stringify(req));
         return await this.fullReq('/wallet/triggersmartcontract', req);
