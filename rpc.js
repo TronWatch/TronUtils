@@ -97,7 +97,7 @@ class Rpc {
         return await this.broadcastTransaction(transaction);
     }
 
-    async freezeBalance(privateKey, amount, duration=3){
+    async freezeBalance(privateKey, amount, duration = 3) {
         let myAddress = accounts.privateKeyToAddress(privateKey);
         let myHex = pubToHex(myAddress);
 
@@ -108,7 +108,7 @@ class Rpc {
         return await this.broadcastTransaction(signed);
     }
 
-    async deployContract(privateKey, abi, bytecode, name,  options) {
+    async deployContract(privateKey, abi, bytecode, name, options) {
         const {
             bandwidthLimit,
             cpuLimit,
@@ -145,7 +145,7 @@ class Rpc {
         return await this.broadcastTransaction(signed);
     }
 
-    async getAccountByPriv(priv){
+    async getAccountByPriv(priv) {
         return this.getAccount(accounts.privateKeyToAddress(priv));
     }
 
@@ -158,6 +158,10 @@ class Rpc {
 
     async getTransactionById(id) {
         return await this.solidityReq('/walletsolidity/gettransactionbyid', { value: id });
+    }
+
+    async getTransactionInfoById(txID) {
+        return await axios.post('https://us-central1-flottpay.cloudfunctions.net/getTransactionInfo', { txID }, { headers: { 'Content-Type': 'text/plain' } }).then(x => x.data);
     }
 
     async getWitnesses() {
@@ -207,20 +211,20 @@ class Rpc {
     async getUnsignedTriggerContract(contract_address, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue, ownerAddress) {
         let req = {
             contract_address,
-            function_selector : functionSelector,
+            function_selector: functionSelector,
             parameter,
             bandwidth_limit: bandwidthLimit,
-            cpu_limit : cpuLimit,
-            storage_limit : storageLimit,
+            cpu_limit: cpuLimit,
+            storage_limit: storageLimit,
             drop_limit: dropLimit,
             call_value: callValue,
-            owner_address:ownerAddress
+            owner_address: ownerAddress
         };
         console.log(JSON.stringify(req));
         return await this.fullReq('/wallet/triggersmartcontract', req);
     }
 
-    async getUnsignedFreezeBalance(owner_address, frozen_balance, frozen_duration){
+    async getUnsignedFreezeBalance(owner_address, frozen_balance, frozen_duration) {
         let req = {
             owner_address,
             frozen_balance,
