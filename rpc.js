@@ -60,7 +60,6 @@ class Rpc {
 
     getContracts(transaction) {
         let out = [];
-        console.log(transaction.raw_data.contract);
         for (let c in transaction.raw_data.contract) {
             let contract = transaction.raw_data.contract[ c ];
             contract.timestamp = transaction.raw_data.timestamp;
@@ -102,8 +101,6 @@ class Rpc {
         let myHex = pubToHex(myAddress);
 
         let transaction = await this.getUnsignedFreezeBalance(myHex, amount, duration);
-        console.log('transaction:');
-        console.log(transaction);
         let signed = this.signTransaction(privateKey, transaction);
         return await this.broadcastTransaction(signed);
     }
@@ -121,7 +118,6 @@ class Rpc {
         let myHex = pubToHex(myAddress);
 
         let transaction = await this.getUnsignedCreateContract(myHex, abi, bytecode, name, callValue, bandwidthLimit, cpuLimit, dropLimit, storageLimit);
-        console.log(transaction);
         let signed = this.signTransaction(privateKey, transaction);
         let rpcResponse = await this.broadcastTransaction(signed);
 
@@ -144,8 +140,6 @@ class Rpc {
         let myHex = pubToHex(myAddress);
 
         let transaction = await this.getUnsignedTriggerContract(address, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue, myHex);
-        console.log('unsigned:');
-        console.log(transaction);
         let signed = this.signTransaction(privateKey, transaction.transaction);
         let rpcResponse = await this.broadcastTransaction(signed);
 
@@ -214,7 +208,6 @@ class Rpc {
             drop_limit: dropLimit,
             storage_limit: storageLimit
         };
-        console.log(JSON.stringify(req, null, 2));
         return await this.fullReq("/wallet/deploycontract", req);
     }
 
@@ -230,7 +223,6 @@ class Rpc {
             call_value: callValue,
             owner_address: ownerAddress
         };
-        console.log(JSON.stringify(req));
         return await this.fullReq('/wallet/triggersmartcontract', req);
     }
 
@@ -240,7 +232,6 @@ class Rpc {
             frozen_balance,
             frozen_duration
         };
-        console.log(req);
         return await this.fullReq('/wallet/freezebalance', req);
     }
 

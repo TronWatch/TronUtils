@@ -37,7 +37,6 @@ function getSignature(priKeyBytes, txID){
     priKeyBytes = hexStr2byteArray(priKeyBytes);
   }
 
-  console.log("TXID: " + txID);
   let hashBytes = hexStr2byteArray(txID);
   let signBytes = ECKeySign(hashBytes, priKeyBytes);
   let uint8Array = new Uint8Array(signBytes);
