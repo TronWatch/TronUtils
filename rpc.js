@@ -122,8 +122,13 @@ class Rpc {
 
         let transaction = await this.getUnsignedCreateContract(myHex, abi, bytecode, name, callValue, bandwidthLimit, cpuLimit, dropLimit, storageLimit);
         console.log(transaction);
-        transaction = this.signTransaction(privateKey, transaction);
-        return await this.broadcastTransaction(transaction);
+        let signed = this.signTransaction(privateKey, transaction);
+        let rpcResponse = await this.broadcastTransaction(signed);
+
+        return {
+            rpcResponse,
+            transaction
+        };
     }
 
     async triggerContract(privateKey, address, functionSelector, parameter, options) {
@@ -142,7 +147,12 @@ class Rpc {
         console.log('unsigned:');
         console.log(transaction);
         let signed = this.signTransaction(privateKey, transaction.transaction);
-        return await this.broadcastTransaction(signed);
+        let rpcResponse = await this.broadcastTransaction(signed);
+
+        return {
+            rpcResponse,
+            transaction
+        };
     }
 
     async getAccountByPriv(priv) {
