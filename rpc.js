@@ -1,7 +1,7 @@
 const accounts = require("./account.js");
 
 const axios = require("axios");
-const { pubToHex, getSignature } = require("./utils/crypto");
+const {pubToHex, getSignature} = require("./utils/crypto");
 
 class Rpc {
 
@@ -61,9 +61,11 @@ class Rpc {
     getContracts(transaction) {
         let out = [];
         for (let c in transaction.raw_data.contract) {
-            let contract = transaction.raw_data.contract[ c ];
+            let contract = transaction.raw_data.contract[c];
             contract.timestamp = transaction.raw_data.timestamp;
             contract.txID = transaction.txID;
+            if(transaction.contract_address)
+                contract.contract_address = transaction.contract_address;
             out.push(contract);
         }
         return out;
@@ -161,11 +163,11 @@ class Rpc {
     }
 
     async getTransactionById(id) {
-        return await this.solidityReq('/walletsolidity/gettransactionbyid', { value: id });
+        return await this.solidityReq('/walletsolidity/gettransactionbyid', {value: id});
     }
 
     async getTransactionInfoById(txID) {
-        return await axios.post('https://us-central1-flottpay.cloudfunctions.net/getTransactionInfo', { txID }, { headers: { 'Content-Type': 'text/plain' } }).then(x => x.data);
+        return await axios.post('https://us-central1-flottpay.cloudfunctions.net/getTransactionInfo', {txID}, {headers: {'Content-Type': 'text/plain'}}).then(x => x.data);
     }
 
     async getWitnesses() {
@@ -177,7 +179,7 @@ class Rpc {
     }
 
     async getBlock(id) {
-        return await this.solidityReq('/walletsolidity/getblockbynum', { num: id });
+        return await this.solidityReq('/walletsolidity/getblockbynum', {num: id});
     }
 
     async getTokens() {
