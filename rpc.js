@@ -64,7 +64,7 @@ class Rpc {
             let contract = transaction.raw_data.contract[c];
             contract.timestamp = transaction.raw_data.timestamp;
             contract.txID = transaction.txID;
-            if(transaction.contract_address)
+            if (transaction.contract_address)
                 contract.contract_address = transaction.contract_address;
             out.push(contract);
         }
@@ -147,6 +147,23 @@ class Rpc {
 
         return {
             rpcResponse,
+            transaction
+        };
+    }
+
+    async callContract(callerAddress, contractAddress, functionSelector, parameter, options) {
+        const {
+            bandwidthLimit,
+            cpuLimit,
+            dropLimit,
+            storageLimit,
+            callValue
+        } = options;
+
+        let callerHex = pubToHex(callerAddress);
+        let transaction = await this.getUnsignedTriggerContract(contractAddress, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue, callerHex);
+
+        return {
             transaction
         };
     }
