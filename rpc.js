@@ -109,17 +109,14 @@ class Rpc {
 
     async deployContract(privateKey, abi, bytecode, name, options) {
         const {
-            bandwidthLimit,
-            cpuLimit,
-            dropLimit,
-            storageLimit,
+            feeLimit,
             callValue
         } = options;
 
         let myAddress = accounts.privateKeyToAddress(privateKey);
         let myHex = pubToHex(myAddress);
 
-        let transaction = await this.getUnsignedCreateContract(myHex, abi, bytecode, name, callValue, bandwidthLimit, cpuLimit, dropLimit, storageLimit);
+        let transaction = await this.getUnsignedCreateContract(myHex, abi, bytecode, name, callValue, feeLimit);
         let signed = this.signTransaction(privateKey, transaction);
         let rpcResponse = await this.broadcastTransaction(signed);
 
@@ -131,17 +128,14 @@ class Rpc {
 
     async triggerContract(privateKey, address, functionSelector, parameter, options) {
         const {
-            bandwidthLimit,
-            cpuLimit,
-            dropLimit,
-            storageLimit,
+            feeLimit,
             callValue
         } = options;
 
         let myAddress = accounts.privateKeyToAddress(privateKey);
         let myHex = pubToHex(myAddress);
 
-        let transaction = await this.getUnsignedTriggerContract(address, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue, myHex);
+        let transaction = await this.getUnsignedTriggerContract(address, functionSelector, parameter, feeLimit, callValue, myHex);
         let signed = this.signTransaction(privateKey, transaction.transaction);
         let rpcResponse = await this.broadcastTransaction(signed);
 
@@ -153,15 +147,12 @@ class Rpc {
 
     async callContract(callerAddress, contractAddress, functionSelector, parameter, options) {
         const {
-            bandwidthLimit,
-            cpuLimit,
-            dropLimit,
-            storageLimit,
+            feeLimit,
             callValue
         } = options;
 
         let callerHex = pubToHex(callerAddress);
-        let transaction = await this.getUnsignedTriggerContract(contractAddress, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue, callerHex);
+        let transaction = await this.getUnsignedTriggerContract(contractAddress, functionSelector, parameter, feeLimit, callValue, callerHex);
 
         return {
             transaction
@@ -183,8 +174,8 @@ class Rpc {
         return await this.solidityReq('/walletsolidity/gettransactionbyid', {value: id});
     }
 
-    async getTransactionInfoById(txID) {
-        return await axios.post('https://us-central1-flottpay.cloudfunctions.net/getTransactionInfo', {txID}, {headers: {'Content-Type': 'text/plain'}}).then(x => x.data);
+    async getTransactionInfoById(id) {
+        return await this.solidityReq('/walletsolidity/gettransactioninfobyid', {value: id});
     }
 
     async getWitnesses() {
