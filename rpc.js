@@ -215,30 +215,24 @@ class Rpc {
         });
     }
 
-    async getUnsignedCreateContract(owner, abi, bytecode, name, callValue, bandwidthLimit, cpuLimit, dropLimit, storageLimit) {
+    async getUnsignedCreateContract(owner, abi, bytecode, name, callValue, feeLimit) {
         let req = {
             abi: JSON.stringify(abi),
             bytecode: bytecode,
             contract_name: name,
             owner_address: owner,
             call_value: callValue,
-            bandwidth_limit: bandwidthLimit,
-            cpu_limit: cpuLimit,
-            drop_limit: dropLimit,
-            storage_limit: storageLimit
+            fee_limit : feeLimit,
         };
         return await this.fullReq("/wallet/deploycontract", req);
     }
 
-    async getUnsignedTriggerContract(contract_address, functionSelector, parameter, bandwidthLimit, cpuLimit, storageLimit, dropLimit, callValue, ownerAddress) {
+    async getUnsignedTriggerContract(contract_address, functionSelector, parameter, feeLimit, callValue, ownerAddress) {
         let req = {
             contract_address,
             function_selector: functionSelector,
             parameter,
-            bandwidth_limit: bandwidthLimit,
-            cpu_limit: cpuLimit,
-            storage_limit: storageLimit,
-            drop_limit: dropLimit,
+            fee_limit : feeLimit,
             call_value: callValue,
             owner_address: ownerAddress
         };
