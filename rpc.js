@@ -36,25 +36,25 @@ class Rpc {
         return (await this.fullReq("/wallet/broadcasttransaction", transaction));
     }
 
-    async getTransactionsFromThis(address) {
+    async getTransactionsFromThis(address, offset = 0, limit = 50) {
         let hex = pubToHex(address);
         return await this.solidityReq('/walletextension/gettransactionsfromthis', {
             account: {
                 address: hex
             },
-            offset: 0,
-            limit: 50
+            offset,
+            limit
         });
     }
 
-    async getTransactionsToThis(address) {
+    async getTransactionsToThis(address, offset = 0, limit = 50) {
         let hex = pubToHex(address);
         return await this.solidityReq('/walletextension/gettransactionstothis', {
             account: {
                 address: hex
             },
-            offset: 0,
-            limit: 50
+            offset,
+            limit
         });
     }
 
@@ -71,9 +71,9 @@ class Rpc {
         return out;
     }
 
-    async getTransactions(address) {
-        let transactionsTo = await this.getTransactionsToThis(address);
-        let transactionsFrom = await this.getTransactionsFromThis(address);
+    async getTransactions(address, offset = 0, limit = 50) {
+        let transactionsTo = await this.getTransactionsToThis(address, offset, limit);
+        let transactionsFrom = await this.getTransactionsFromThis(address, offset, limit);
 
         let contracts = [];
 
@@ -94,6 +94,15 @@ class Rpc {
         let myHex = pubToHex(myAddress);
         let theirHex = pubToHex(recipient);
         let transaction = await this.getUnsignedSendTrx(myHex, theirHex, amount);
+        transaction = this.signTransaction(privateKey, transaction);
+        return await this.broadcastTransaction(transaction);
+    }
+
+    async sendAsset(privateKey, recipient, asset, amount) {
+        let myAddress = accounts.privateKeyToAddress(privateKey);
+        let myHex = pubToHex(myAddress);
+        let theirHex = pubToHex(recipient);
+        let transaction = await this.getUnsignedTransferAsset(myHex, theirHex, asset, amount);
         transaction = this.signTransaction(privateKey, transaction);
         return await this.broadcastTransaction(transaction);
     }
@@ -206,6 +215,15 @@ class Rpc {
         });
     }
 
+    async getUnsignedTransferAsset(owner_address, to_address, asset_name, amount) {
+        return await this.fullReq('/wallet/transferasset', {
+            owner_address,
+            to_address,
+            asset_name,
+            amount
+        });
+    }
+
     async getUnsignedCreateContract(owner, abi, bytecode, name, callValue, feeLimit) {
         let req = {
             abi: JSON.stringify(abi),
@@ -213,7 +231,7 @@ class Rpc {
             contract_name: name,
             owner_address: owner,
             call_value: callValue,
-            fee_limit : feeLimit,
+            fee_limit: feeLimit,
         };
         return await this.fullReq("/wallet/deploycontract", req);
     }
@@ -223,7 +241,7 @@ class Rpc {
             contract_address,
             function_selector: functionSelector,
             parameter,
-            fee_limit : feeLimit,
+            fee_limit: feeLimit,
             call_value: callValue,
             owner_address: ownerAddress
         };
