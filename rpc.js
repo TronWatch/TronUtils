@@ -1,4 +1,5 @@
 const accounts = require("./account.js");
+const assert = require('assert');
 
 const axios = require("axios");
 const {pubToHex, getSignature} = require("./utils/crypto");
@@ -103,6 +104,14 @@ class Rpc {
         let myHex = pubToHex(myAddress);
         let theirHex = pubToHex(recipient);
         let transaction = await this.getUnsignedTransferAsset(myHex, theirHex, asset, amount);
+        transaction = this.signTransaction(privateKey, transaction);
+        return await this.broadcastTransaction(transaction);
+    }
+
+    async issueAsset(privateKey, options) {
+        let myAddress = accounts.privateKeyToAddress(privateKey);
+        options.owner_address = pubToHex(myAddress);
+        let transaction = await this.getUnsignedCreateAssetIssue(options);
         transaction = this.signTransaction(privateKey, transaction);
         return await this.broadcastTransaction(transaction);
     }
@@ -222,6 +231,27 @@ class Rpc {
             asset_name,
             amount
         });
+    }
+
+    async getUnsignedCreateAssetIssue(options) {
+        assert(options.owner_address !== undefined, 'owner_address must be present in getUnsignedCreateAssetIssue');
+        assert(options.name !== undefined, 'name must be present in getUnsignedCreateAssetIssue');
+        assert(options.abbr !== undefined, 'abbr must be present in getUnsignedCreateAssetIssue');
+        assert(options.total_supply !== undefined, 'total_supply must be present in getUnsignedCreateAssetIssue');
+        assert(options.trx_num !== undefined, 'trx_num must be present in getUnsignedCreateAssetIssue');
+        assert(options.num !== undefined, 'num must be present in getUnsignedCreateAssetIssue');
+        assert(options.start_time !== undefined, 'start_time must be present in getUnsignedCreateAssetIssue');
+        assert(options.end_time !== undefined, 'end_time must be present in getUnsignedCreateAssetIssue');
+        assert(options.vote_score !== undefined, 'vote_score must be present in getUnsignedCreateAssetIssue');
+        assert(options.description !== undefined, 'description must be present in getUnsignedCreateAssetIssue');
+        assert(options.url !== undefined, 'url must be present in getUnsignedCreateAssetIssue');
+        assert(options.free_asset_net_limit !== undefined, 'free_asset_net_limit must be present in getUnsignedCreateAssetIssue');
+        assert(options.public_free_asset_net_limit !== undefined, 'public_free_asset_net_limit must be present in getUnsignedCreateAssetIssue');
+        assert(options.frozen_supply !== undefined, 'frozen_supply must be present in getUnsignedCreateAssetIssue');
+        assert(options.frozen_supply.frozen_amount !== undefined, 'frozen_supply.frozen_amount must be present in getUnsignedCreateAssetIssue');
+        assert(options.frozen_supply.frozen_days !== undefined, 'frozen_supply.frozen_days must be present in getUnsignedCreateAssetIssue');
+
+        return await this.fullReq('/wallet/createassetissue', options);
     }
 
     async getUnsignedCreateContract(owner, abi, bytecode, name, callValue, feeLimit) {
