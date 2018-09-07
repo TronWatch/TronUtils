@@ -19,7 +19,6 @@ class Rpc {
         })).data;
     }
 
-
     async fullReq(url, args = {}) {
         return this.rpcReq(this.url_full, url, args);
     }
@@ -121,6 +120,15 @@ class Rpc {
         let myHex = pubToHex(myAddress);
 
         let transaction = await this.getUnsignedFreezeBalance(myHex, amount, duration);
+        let signed = this.signTransaction(privateKey, transaction);
+        return await this.broadcastTransaction(signed);
+    }
+
+    async unfreezeBalance(privateKey) {
+        let myAddress = accounts.privateKeyToAddress(privateKey);
+        let myHex = pubToHex(myAddress);
+
+        let transaction = await this.getUnsignedUnfreezeBalance(myHex);
         let signed = this.signTransaction(privateKey, transaction);
         return await this.broadcastTransaction(signed);
     }
@@ -285,6 +293,13 @@ class Rpc {
             frozen_duration
         };
         return await this.fullReq('/wallet/freezebalance', req);
+    }
+
+    async getUnsignedUnfreezeBalance(owner_address) {
+        let req = {
+            owner_address
+        };
+        return await this.fullReq('/wallet/unfreezebalance', req);
     }
 
 }
